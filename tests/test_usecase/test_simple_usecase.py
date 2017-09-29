@@ -1,5 +1,5 @@
 from fictilis.action import Action, ActionStratagy
-from fictilis.algorithm import AlgorithmBuilder
+from fictilis.algbuilder import AlgorithmBuilder, MagicAlgorithmBuilder
 from fictilis.interpreter import BaseInterpreter
 from fictilis.parameter import Parameter
 from fictilis import types
@@ -8,7 +8,6 @@ from fictilis.context import Context
 
 def test_simple_usecases():
     res = Parameter(name='res', type_=types.Numeric)
-    context = Parameter(name='context', type_=types.ContextType)
     a = Parameter(name='a', type_=types.Numeric)
     b = Parameter(name='b', type_=types.Numeric)
 
@@ -49,18 +48,52 @@ def test_simple_usecases():
     print('------------------------')
     print(SubtractionA)
     print('------------------------')
-    res = BaseInterpreter.evaluate(SubtractionA, context=Context(), params=dict(a='1', b=2))
-    print(res)
-    assert isinstance(res, dict)
-    assert set(res.keys()) == {'res'}
-    assert res['res'] == -1
+    result = BaseInterpreter.evaluate(SubtractionA, context=Context(), params=dict(a='1', b=2))
+    print(result)
+    assert isinstance(result, dict)
+    assert set(result.keys()) == {'res'}
+    assert result['res'] == -1
 
     # квадрат
     print(SquareA)
     print('------------------------')
-    res = BaseInterpreter.evaluate(SquareA, context=Context(), params=dict(a=3))
-    print(res)
-    assert isinstance(res, dict)
-    assert set(res.keys()) == {'res'}
-    assert res['res'] == 9
+    result = BaseInterpreter.evaluate(SquareA, context=Context(), params=dict(a=3))
+    print(result)
+    assert isinstance(result, dict)
+    assert set(result.keys()) == {'res'}
+    assert result['res'] == 9
     print('------------------------')
+
+    #  Magic
+
+    # вычитание
+    def magic_build_subtraction(a, b):
+        return SumA(a=a, b=NegationA(b))
+
+    MagicSubtractionA = MagicAlgorithmBuilder.build('MagicSubtraction', [a, b], [res], builder=magic_build_subtraction)
+
+    # квадрат числа
+    def magic_build_square(a):
+        return MultiA(a=a, b=a)
+
+    MagicSquareA = MagicAlgorithmBuilder.build('MagicSquare', [a], [res], builder=magic_build_square)
+
+    # квадрат
+    print(MagicSquareA)
+    print('------------------------')
+    result = BaseInterpreter.evaluate(MagicSquareA, context=Context(), params=dict(a=3))
+    print(result)
+    assert isinstance(result, dict)
+    assert set(result.keys()) == {'res'}
+    assert result['res'] == 9
+    print('------------------------')
+
+    # вычитание
+    print('------------------------')
+    print(MagicSubtractionA)
+    print('------------------------')
+    result = BaseInterpreter.evaluate(MagicSubtractionA, context=Context(), params=dict(a='1', b=2))
+    print(result)
+    assert isinstance(result, dict)
+    assert set(result.keys()) == {'res'}
+    assert result['res'] == -1

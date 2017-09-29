@@ -9,7 +9,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='fictilis',
-    version='0.0.1',
+    version='0.0.2',
     description="Service for processing's abstractions",
     long_description=long_description,
     url='https://gitlab.rc-online.ru/general/fictilis',

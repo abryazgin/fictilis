@@ -3,37 +3,6 @@ from .action import Action
 from .types import ContextType
 
 
-class AlgorithmBuilder:
-    """
-    Построитель алгоритмов
-    """
-    @staticmethod
-    def build(code, in_params, out_params, builder):
-        alg = Algorithm(code=code, in_params=in_params, out_params=out_params)
-        steps = list()
-        binds = dict()
-
-        def bind(fromlet, tolet):
-            binds[tolet] = fromlet
-
-        def register(action):
-            step = Step(action=action, algorithm=alg, number=len(steps))
-            steps.append(step)
-            return step
-
-        res = builder(register=register, bind=bind, **alg.inlets)
-        if len(alg.outlets) == 1:
-            res = [res]
-        if len(alg.outlets) != len(res):
-            raise InvalidParams('Length of outlets ({}) of algorithm {} not match length of results ({})'.format(
-                len(alg.outlets), code, len(res)))
-        for i in range(len(res)):
-            bind(res[i], alg.get_outlet(index=i))
-        alg.set_params(steps=steps, binds=binds)
-        alg.validate_graph()
-        return alg
-
-
 class Algorithm(Action):
     """
     Алгоритм - последовательность Действий и набор связей между ними
@@ -84,13 +53,20 @@ class Step:
         self.step_outlets = {
             code: StepOutlet(step=self, outlet=outlet) for code, outlet in self.action.get_outlets().items()}
 
-    def get_inlet(self, code):
-        return self._get_let(code, 'in')
+    def get_inlet(self, code=None, index=None):
+        return self._get_let(code, index, 'in')
 
-    def get_outlet(self, code):
-        return self._get_let(code, 'out')
+    def get_outlet(self, code=None, index=None):
+        return self._get_let(code, index, 'out')
 
-    def _get_let(self, code, t):
+    def _get_let(self, code, index, t):
+        assert code or index is not None
+        if index is not None:
+            try:
+                code = self.action.get_outlets_keys()[index] if t == 'out' else self.action.get_inlets_keys()[index]
+            except IndexError:
+                raise InvalidParams('Step <{}> does not have {}let with index `{}`'.format(
+                    repr(self), t, index))
         try:
             return self.step_outlets[code] if t == 'out' else self.step_inlets[code]
         except KeyError:
@@ -109,6 +85,9 @@ class Step:
     def __repr__(self):
         return 'Step(action={}, algorithm={}, number={})'.format(
             repr(self.action), repr(self.algorithm), repr(self.number))
+
+    def __getattr__(self, key):
+        return self.get_outlet(key)
 
 
 class StepInlet:

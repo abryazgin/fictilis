@@ -65,12 +65,12 @@ class Action:
             try:
                 code = self._outlets_indexes[index] if t == 'out' else self._inlets_indexes[index]
             except IndexError:
-                raise InvalidParams('Step <{}> does not have {}let with index `{}`'.format(
+                raise InvalidParams('Action <{}> does not have {}let with index `{}`'.format(
                     repr(self), t, index))
         try:
             return self.outlets[code] if t == 'out' else self.inlets[code]
         except KeyError:
-            raise InvalidParams('Step <{}> does not have {}let with code `{}`'.format(
+            raise InvalidParams('Action <{}> does not have {}let with code `{}`'.format(
                 repr(self), t, code))
 
     def get_inlets(self):
