@@ -29,12 +29,12 @@ class AlgorithmBuilder:
 
         res = cls._build(builder=builder, params=dict(register=register, bind=bind, **alg.inlets))
         if len(alg.outlets) == 1:
-            res = [cls._outlet_from_step(res)]
+            res = [res]
         if len(alg.outlets) != len(res):
             raise InvalidParams('Length of outlets ({}) of algorithm {} not match length of results ({})'.format(
                 len(alg.outlets), code, len(res)))
         for i in range(len(res)):
-            bind(res[i], alg.get_outlet(index=i))
+            bind(cls._outlet_from_step(res[i]), alg.get_outlet(index=i))
         alg.set_params(steps=steps, binds=binds)
         alg.validate_graph()
         return alg
