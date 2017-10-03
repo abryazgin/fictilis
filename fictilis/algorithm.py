@@ -18,6 +18,12 @@ class Algorithm(Action):
         self.binds = binds
 
     def validate_graph(self):
+        """
+        Валидация графа Алгоритма
+        Проверяет, что у всех зарегистрированнх Шагов привязаны/"указаны" входные параметры
+
+        :raises: InvalidDeclaration
+        """
         for step in self.steps:
             for stepinlet in step.get_inlets().values():
                 if stepinlet not in self.binds and stepinlet.inlet.get_type() != ContextType:
@@ -125,6 +131,11 @@ class StepOutlet:
 
 
 class AlgorithmPool:
+    """
+    Пул Алгоритмов
+
+    В этом пуле хранится список задекларированных Алгоритмов
+    """
     _pool = dict()
 
     @staticmethod

@@ -8,6 +8,14 @@ class BaseInterpreter:
 
     @classmethod
     def evaluate(cls, action, context, params):
+        """
+        Выполнение Действия (или Алгоритма, как частный случай)
+
+        :param action: Действие
+        :param context: Контекст выполнения
+        :param params: Параметры выполнения
+        :return: Результаты выполнения Действия
+        """
         # make copy of params
         params = dict(**params)
         return cls._evaluate(action, context, params)

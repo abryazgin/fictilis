@@ -48,15 +48,39 @@ class Action:
         self._outlets_indexes = tuple(o.name for o in out_params)
 
     def get_inlets_keys(self):
+        """
+        Получения списка ключей (названий) Вводов
+        Порядок соответствует порядку входных параметров при вызове
+        :return: [<Inlet>, ...]
+        """
         return self._inlets_indexes
 
     def get_outlets_keys(self):
+        """
+        Получения списка ключей (названий) Выходов
+        Порядок соответствует порядку результатов при вызове
+        :return: [<OutLet>, ...]
+        """
         return self._outlets_indexes
 
     def get_inlet(self, code=None, index=None):
+        """
+        Получение Ввода по его коду/индексу
+
+        :param code: код Ввода
+        :param index: индекс Ввода
+        :return: <InLet>
+        """
         return self._get_let(code, index, 'in')
 
     def get_outlet(self, code=None, index=None):
+        """
+        Получение Выхода по его коду/индексу
+
+        :param code: код Выхода
+        :param index: индекс Выхода
+        :return: <OutLet>
+        """
         return self._get_let(code, index, 'out')
 
     def _get_let(self, code, index, t):
@@ -74,22 +98,46 @@ class Action:
                 repr(self), t, code))
 
     def get_inlets(self):
+        """
+        Получение списка Вводов
+        :return: <dict(InLet.code=InLet, ...)>
+        """
         return self.inlets
 
     def get_outlets(self):
+        """
+        Получение списка Выходов
+        :return: <dict(OutLet.code=OutLet, ...)>
+        """
         return self.outlets
 
     def validate_inputs(self, kwinputs):
+        """
+        Валидация входных параметров
+
+        :param kwinputs: <dict> параметры Действия
+        :return: <dict> отвалидированные параметры Действия
+                        (возможно видоизмененные: например, приведены к типам)
+        """
         kwinputs = kwinputs or dict()
         assert isinstance(kwinputs, dict)
         kwinputs = self._validate_values_quantity(kwvalues=kwinputs, t='in')
-        return self._validate_values_quality(kwvalues=kwinputs, t='in')
+        kwinputs = self._validate_values_quality(kwvalues=kwinputs, t='in')
+        return kwinputs
 
     def validate_outputs(self, kwoutputs):
+        """
+        Валидация выходных параметров
+
+        :param kwoutputs: <dict> результаты выполнения Действия
+        :return: <dict> отвалидированные параметры Действия
+                        (возможно видоизмененные: например, приведены к типам)
+        """
         kwoutputs = kwoutputs or dict()
         assert isinstance(kwoutputs, dict)
         kwoutputs = self._validate_values_quantity(kwvalues=kwoutputs, t='out')
-        return self._validate_values_quality(kwvalues=kwoutputs, t='out')
+        kwoutputs = self._validate_values_quality(kwvalues=kwoutputs, t='out')
+        return kwoutputs
 
     def _validate_values_quality(self, kwvalues, t):
         for code in kwvalues:
@@ -142,9 +190,23 @@ class ActionStrategy:
 
     @staticmethod
     def execute(code, strategy, kwparams=None):
+        """
+        Выполнение Стратегии выполнения Действия
+
+        :param code: код Действия
+        :param strategy: Стратегия
+        :param kwparams: Параметры выполнения
+        :return: Результат выполнения Стратегии выполнения Действия
+        """
         return ActionStrategyPool.get(code=code, strategy=strategy).evaluate(kwparams)
 
     def evaluate(self, kwparams=None):
+        """
+        Выполнение
+
+        :param kwparams: Параметры выполнения
+        :return: Результат выполнения Стратегии выполнения Действия
+        """
         try:
             return self.function(**kwparams)
         except TypeError:
@@ -153,10 +215,21 @@ class ActionStrategy:
 
 
 class ActionPool:
+    """
+    Пул Действий
+
+    В этом пуле хранится список задекларированных Действий
+    """
     _pool = dict()
 
     @staticmethod
     def register(code, action):
+        """
+        Регистрация Действия
+
+        :param code: код Действия
+        :param action: Действие
+        """
         if not isinstance(action, Action):
             raise InvalidType('Action for ActionPool must be instance of `Action` class|subclass')
         if code in ActionPool._pool:
@@ -165,16 +238,35 @@ class ActionPool:
 
     @staticmethod
     def get(code):
+        """
+        Получение Действия по коду
+
+        :param code: код Действия
+        :return: <Action>
+        """
         if code not in ActionPool._pool:
             raise NotExistsError('Action with code {code} does not exists'.format(code=code))
         return ActionPool._pool[code]
 
 
 class ActionStrategyPool:
+    """
+    Пул Стратегий выполнения Действий
+
+    В этом пуле хранится список привязанных к Действиям стратегий выполнения
+    Стратегией выполнения может быть другое Действие/Алгоритм
+    """
     _pool = defaultdict(dict)
 
     @staticmethod
     def register(code, strategy, actionstrategy):
+        """
+        Регистрация Стратегии выполнения Действия
+
+        :param code: код Действия
+        :param strategy: Стратегия
+        :param actionstrategy: Стратегия выполнения Действия
+        """
         isaction = isinstance(actionstrategy, Action)
         isatrategy = isinstance(actionstrategy, ActionStrategy)
         if not (isaction or isatrategy):
@@ -187,6 +279,13 @@ class ActionStrategyPool:
 
     @staticmethod
     def get(code, strategy):
+        """
+        Получение Стратегии выполнения Действия по коду Действия и Стратегии
+
+        :param code: код Действия
+        :param strategy: Стратегия
+        :return: <ActionStratagy | Action>
+        """
         if code not in ActionStrategyPool._pool:
             raise NotExistsError('ActionStrategy for Action with code {code} does not exists'.format(code=code))
         if strategy not in ActionStrategyPool._pool[code]:
@@ -197,6 +296,12 @@ class ActionStrategyPool:
 
     @staticmethod
     def list(code):
+        """
+        Получение списка Стратегий выполнения Действий по коду Действия
+
+        :param code: код Действия
+        :return: [<ActionStratagy | Action>, ...]
+        """
         if code not in ActionStrategyPool._pool:
             raise NotExistsError('ActionStrategy for Action with code {code} does not exists'.format(code=code))
         return ActionStrategyPool._pool[code]

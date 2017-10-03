@@ -6,26 +6,59 @@ from .errors import InvalidParams, InvalidDeclaration
 class AlgorithmBuilder:
     """
     Построитель алгоритмов
+
+    Основной метод AlgorithmBuilder.build(code, in_params, out_params, builder)
+
+        :param code: код нового Алгоритма
+        :param in_params: [<Parameter>, ...] Аргументы Алгоритма
+        :param out_params: [<Parameter>, ...] Результаты Алгоритма
+        :param builder: <func> функция-построитель дерева Алгоритма:
+                В качестве первых двух параметров всегда принимает специальные аргументы register и bind,
+                использующиеся для регистрации Шагов(register) и описания поток данных(bind), пример:
+
+                ```
+                def build_square(bind, register, a):
+                    multi = register(MultiA)
+                    bind(fromlet=a, tolet=multi.get_inlet('a'))
+                    bind(fromlet=a, tolet=multi.get_inlet('b'))
+                    return multi.get_outlet('res')
+                ```
+                register(action=) :return <Step>
+                bind(fromlet=, tolet=)
+        :return: <Algorithm>
+
+    Пример использования:
+
+        ```
+        res = Parameter(name='res', type_=types.Numeric)
+        a = Parameter(name='a', type_=types.Numeric)
+        b = Parameter(name='b', type_=types.Numeric)
+
+        # actions
+        MultiA = Action('Multi', [a, b], [res])  # умножение
+
+        # квадрат числа
+        def build_square(bind, register, a):
+            multi = register(MultiA)
+            bind(fromlet=a, tolet=multi.get_inlet('a'))
+            bind(fromlet=a, tolet=multi.get_inlet('b'))
+            return multi.get_outlet('res')
+
+        SquareA = AlgorithmBuilder.build('Square', [a], [res], builder=build_square)
+        ```
     """
 
     @classmethod
-    def get_spec_funcs(cls, alg, binds, steps):
-        def bind(fromlet, tolet):
-            binds[tolet] = fromlet
-
-        def register(action):
-            step = Step(action=action, algorithm=alg, number=len(steps))
-            steps.append(step)
-            return step
-        return bind, register
-
-    @classmethod
     def build(cls, code, in_params, out_params, builder):
+        """
+        Построение Алгоритма
+        :return: <Algorithm>
+        """
         alg = Algorithm(code=code, in_params=in_params, out_params=out_params)
         steps = list()
         binds = dict()
 
-        bind, register = cls.get_spec_funcs(alg=alg, binds=binds, steps=steps)
+        bind, register = cls._get_spec_funcs(alg=alg, binds=binds, steps=steps)
 
         res = cls._build(builder=builder, params=dict(register=register, bind=bind, **alg.inlets))
         if len(alg.outlets) == 1:
@@ -38,6 +71,17 @@ class AlgorithmBuilder:
         alg.set_params(steps=steps, binds=binds)
         alg.validate_graph()
         return alg
+
+    @classmethod
+    def _get_spec_funcs(cls, alg, binds, steps):
+        def bind(fromlet, tolet):
+            binds[tolet] = fromlet
+
+        def register(action):
+            step = Step(action=action, algorithm=alg, number=len(steps))
+            steps.append(step)
+            return step
+        return bind, register
 
     @classmethod
     def _build(cls, builder, params):
@@ -55,7 +99,38 @@ class AlgorithmBuilder:
 
 class MagicAlgorithmBuilder(AlgorithmBuilder):
     """
-    Построитель алгоритмов
+    Магический Построитель алгоритмов
+    Используется перегрузка магических методов для увеличения эффективности функции builder.
+    Получается боллее интуитивное использование построения
+
+    Основной метод AlgorithmBuilder.build(code, in_params, out_params, builder)
+
+        :param code: код нового Алгоритма
+        :param in_params: [<Parameter>, ...] Аргументы Алгоритма
+        :param out_params: [<Parameter>, ...] Результаты Алгоритма
+        :param builder: <func> функция-построитель дерева Алгоритма:
+                ```
+                def magic_build_square(a):
+                    return MultiA(a=a, b=a)
+                ```
+        :return: <Algorithm>
+
+    Пример использования:
+
+        ```
+        res = Parameter(name='res', type_=types.Numeric)
+        a = Parameter(name='a', type_=types.Numeric)
+        b = Parameter(name='b', type_=types.Numeric)
+
+        # actions
+        MultiA = Action('Multi', [a, b], [res])  # умножение
+
+        # квадрат числа
+        def magic_build_square(a):
+            return MultiA(a=a, b=a)
+
+        SquareA = AlgorithmBuilder.build('Square', [a], [res], builder=build_square)
+        ```
     """
     @classmethod
     def _build(cls, builder, params):
