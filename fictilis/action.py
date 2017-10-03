@@ -128,7 +128,7 @@ class Action:
         return kwvalues
 
 
-class ActionStratagy:
+class ActionStrategy:
     """
     Стратегия действия
 
@@ -138,7 +138,7 @@ class ActionStratagy:
         self.action = action
         self.strategy = strategy
         self.function = function
-        ActionStrategyPool.register(action.code, strategy, self)
+        ActionStrategyPool.register(code=action.code, strategy=strategy, actionstrategy=self)
 
     @staticmethod
     def execute(code, strategy, kwparams=None):
@@ -157,6 +157,8 @@ class ActionPool:
 
     @staticmethod
     def register(code, action):
+        if not isinstance(action, Action):
+            raise InvalidType('Action for ActionPool must be instance of `Action` class|subclass')
         if code in ActionPool._pool:
             raise AlreadyExistsError('Action with code {} already exists'.format(code))
         ActionPool._pool[code] = action
@@ -173,15 +175,20 @@ class ActionStrategyPool:
 
     @staticmethod
     def register(code, strategy, actionstrategy):
+        isaction = isinstance(actionstrategy, Action)
+        isatrategy = isinstance(actionstrategy, ActionStrategy)
+        if not (isaction or isatrategy):
+            raise InvalidType(
+                'Action-strategy for ActionStrategyPool must be function or instance of `Action` class|subclass')
         if code in ActionStrategyPool._pool and strategy in ActionStrategyPool._pool[code]:
             raise AlreadyExistsError(
-                'Action {} with stratagy {} already exists'.format(code, strategy))
+                'Action {} with strategy {} already exists'.format(code, strategy))
         ActionStrategyPool._pool[code][strategy] = actionstrategy
 
     @staticmethod
     def get(code, strategy):
         if code not in ActionStrategyPool._pool:
-            raise NotExistsError('Action with code {code} does not exists'.format(code=code))
+            raise NotExistsError('ActionStrategy for Action with code {code} does not exists'.format(code=code))
         if strategy not in ActionStrategyPool._pool[code]:
             raise NotExistsError(
                 'Action with code {code} and stategy {strategy} does not exists'.format(
@@ -191,5 +198,5 @@ class ActionStrategyPool:
     @staticmethod
     def list(code):
         if code not in ActionStrategyPool._pool:
-            raise NotExistsError('Action with code {code} does not exists'.format(code=code))
+            raise NotExistsError('ActionStrategy for Action with code {code} does not exists'.format(code=code))
         return ActionStrategyPool._pool[code]

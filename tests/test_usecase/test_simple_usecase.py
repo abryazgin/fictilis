@@ -1,4 +1,4 @@
-from fictilis.action import Action, ActionStratagy
+from fictilis.action import Action, ActionStrategy
 from fictilis.algbuilder import AlgorithmBuilder, MagicAlgorithmBuilder
 from fictilis.interpreter import BaseInterpreter
 from fictilis.parameter import Parameter
@@ -39,10 +39,10 @@ def test_simple_usecases():
 
     # регистрация стратегий в системе
     strategy = 'python'
-    ActionStratagy(action=NegationA, strategy=strategy, function=lambda a: -a)
-    ActionStratagy(action=SumA, strategy=strategy, function=lambda a, b: a + b)
-    ActionStratagy(action=MultiA, strategy=strategy, function=lambda a, b: a * b)
-    ActionStratagy(action=DivisionA, strategy=strategy, function=lambda a, b: a / b)
+    ActionStrategy(action=NegationA, strategy=strategy, function=lambda a: -a)
+    ActionStrategy(action=SumA, strategy=strategy, function=lambda a, b: a + b)
+    ActionStrategy(action=MultiA, strategy=strategy, function=lambda a, b: a * b)
+    ActionStrategy(action=DivisionA, strategy=strategy, function=lambda a, b: a / b)
 
     # вычитание
     print('------------------------')

@@ -1,5 +1,5 @@
 from .algorithm import Algorithm
-from .action import ActionStrategyPool
+from .action import ActionStrategyPool, Action
 from .errors import InvalidParams, InvalidDeclaration
 from . import types
 
@@ -26,6 +26,8 @@ class BaseInterpreter:
     @classmethod
     def _evaluate_action(cls, action, context, params):
         actionstrategy = cls._choose_actionstrategy(action, context, params)
+        if isinstance(actionstrategy, Action):
+            return cls._evaluate(action=actionstrategy, context=context, params=params)
         res = actionstrategy.evaluate(params)
         return cls._result_to_dict(res=res, action=action)
 
