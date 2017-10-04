@@ -1,5 +1,5 @@
 from .algorithm import Algorithm
-from .action import ActionStrategyPool, Action
+from .action import ImplementationPool, Action
 from .errors import InvalidParams, InvalidDeclaration
 from . import types
 
@@ -94,14 +94,14 @@ class BaseInterpreter:
 
     @classmethod
     def _choose_actionstrategy(cls, action, context, params):
-        choices = ActionStrategyPool.list(code=action.code)
+        choices = ImplementationPool.list(code=action.code)
         if len(choices) == 0:
             raise InvalidParams('Strategies for action {code} does not exist'.format(code=action.code))
         # if strategy declared in context
         if context.get('strategy'):
             if context.get('strategy') not in choices:
                 raise InvalidParams(
-                    'For strategy `{strategy}` not declared ActionStrategy for action `{action}`'.format(
+                    'For strategy `{strategy}` not declared Implementation for action `{action}`'.format(
                         strategy=context.get('strategy'), action=action.code
                     ))
             return choices[context.get('strategy')]

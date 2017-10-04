@@ -176,7 +176,7 @@ class Action:
         return kwvalues
 
 
-class ActionStrategy:
+class Implementation:
     """
     Стратегия действия
 
@@ -186,7 +186,7 @@ class ActionStrategy:
         self.action = action
         self.strategy = strategy
         self.function = function
-        ActionStrategyPool.register(code=action.code, strategy=strategy, actionstrategy=self)
+        ImplementationPool.register(code=action.code, strategy=strategy, actionstrategy=self)
 
     @staticmethod
     def execute(code, strategy, kwparams=None):
@@ -198,7 +198,7 @@ class ActionStrategy:
         :param kwparams: Параметры выполнения
         :return: Результат выполнения Стратегии выполнения Действия
         """
-        return ActionStrategyPool.get(code=code, strategy=strategy).evaluate(kwparams)
+        return ImplementationPool.get(code=code, strategy=strategy).evaluate(kwparams)
 
     def evaluate(self, kwparams=None):
         """
@@ -249,7 +249,7 @@ class ActionPool:
         return ActionPool._pool[code]
 
 
-class ActionStrategyPool:
+class ImplementationPool:
     """
     Пул Стратегий выполнения Действий
 
@@ -268,14 +268,14 @@ class ActionStrategyPool:
         :param actionstrategy: Стратегия выполнения Действия
         """
         isaction = isinstance(actionstrategy, Action)
-        isatrategy = isinstance(actionstrategy, ActionStrategy)
+        isatrategy = isinstance(actionstrategy, Implementation)
         if not (isaction or isatrategy):
             raise InvalidType(
-                'Action-strategy for ActionStrategyPool must be function or instance of `Action` class|subclass')
-        if code in ActionStrategyPool._pool and strategy in ActionStrategyPool._pool[code]:
+                'Action-strategy for ImplementationPool must be function or instance of `Action` class|subclass')
+        if code in ImplementationPool._pool and strategy in ImplementationPool._pool[code]:
             raise AlreadyExistsError(
                 'Action {} with strategy {} already exists'.format(code, strategy))
-        ActionStrategyPool._pool[code][strategy] = actionstrategy
+        ImplementationPool._pool[code][strategy] = actionstrategy
 
     @staticmethod
     def get(code, strategy):
@@ -286,13 +286,13 @@ class ActionStrategyPool:
         :param strategy: Стратегия
         :return: <ActionStratagy | Action>
         """
-        if code not in ActionStrategyPool._pool:
-            raise NotExistsError('ActionStrategy for Action with code {code} does not exists'.format(code=code))
-        if strategy not in ActionStrategyPool._pool[code]:
+        if code not in ImplementationPool._pool:
+            raise NotExistsError('Implementation for Action with code {code} does not exists'.format(code=code))
+        if strategy not in ImplementationPool._pool[code]:
             raise NotExistsError(
                 'Action with code {code} and stategy {strategy} does not exists'.format(
                     code=code, strategy=strategy))
-        return ActionStrategyPool._pool[code][strategy]
+        return ImplementationPool._pool[code][strategy]
 
     @staticmethod
     def list(code):
@@ -302,6 +302,6 @@ class ActionStrategyPool:
         :param code: код Действия
         :return: [<ActionStratagy | Action>, ...]
         """
-        if code not in ActionStrategyPool._pool:
-            raise NotExistsError('ActionStrategy for Action with code {code} does not exists'.format(code=code))
-        return ActionStrategyPool._pool[code]
+        if code not in ImplementationPool._pool:
+            raise NotExistsError('Implementation for Action with code {code} does not exists'.format(code=code))
+        return ImplementationPool._pool[code]

@@ -1,4 +1,4 @@
-from fictilis.action import Action, ActionStrategy, ActionStrategyPool as ASP
+from fictilis.action import Action, Implementation, ImplementationPool as ASP
 from fictilis.algbuilder import MagicAlgorithmBuilder
 from fictilis.interpreter import BaseInterpreter
 from fictilis.parameter import Parameter
@@ -20,8 +20,8 @@ def test_strategy_is_algorithm():
 
     A2 = MagicAlgorithmBuilder.build('A2', [a], [res], builder=lambda a: A2_sub(A2_sub(a)))
 
-    ActionStrategy(action=A1, strategy=strategy1, function=lambda a: a + 2)
-    ActionStrategy(action=A2_sub, strategy=strategy2, function=lambda a: a + 1)
+    Implementation(action=A1, strategy=strategy1, function=lambda a: a + 2)
+    Implementation(action=A2_sub, strategy=strategy2, function=lambda a: a + 1)
     ASP.register(code=A.code, strategy=strategy1, actionstrategy=A1)
     ASP.register(code=A.code, strategy=strategy2, actionstrategy=A2)
 
