@@ -182,23 +182,23 @@ class Implementation:
 
     По сути своей является реализацией Действия с помощью определенной Стратегии
     """
-    def __init__(self, action, strategy, function):
+    def __init__(self, action, engine, function):
         self.action = action
-        self.strategy = strategy
+        self.engine = engine
         self.function = function
-        ImplementationPool.register(code=action.code, strategy=strategy, actionstrategy=self)
+        ImplementationPool.register(code=action.code, engine=engine, implementation=self)
 
     @staticmethod
-    def execute(code, strategy, kwparams=None):
+    def execute(code, engine, kwparams=None):
         """
         Выполнение Стратегии выполнения Действия
 
         :param code: код Действия
-        :param strategy: Стратегия
+        :param engine: Стратегия
         :param kwparams: Параметры выполнения
         :return: Результат выполнения Стратегии выполнения Действия
         """
-        return ImplementationPool.get(code=code, strategy=strategy).evaluate(kwparams)
+        return ImplementationPool.get(code=code, engine=engine).evaluate(kwparams)
 
     def evaluate(self, kwparams=None):
         """
@@ -259,40 +259,40 @@ class ImplementationPool:
     _pool = defaultdict(dict)
 
     @staticmethod
-    def register(code, strategy, actionstrategy):
+    def register(code, engine, implementation):
         """
         Регистрация Стратегии выполнения Действия
 
         :param code: код Действия
-        :param strategy: Стратегия
-        :param actionstrategy: Стратегия выполнения Действия
+        :param engine: Стратегия
+        :param implementation: Стратегия выполнения Действия
         """
-        isaction = isinstance(actionstrategy, Action)
-        isatrategy = isinstance(actionstrategy, Implementation)
-        if not (isaction or isatrategy):
+        isaction = isinstance(implementation, Action)
+        isimplementation = isinstance(implementation, Implementation)
+        if not (isaction or isimplementation):
             raise InvalidType(
-                'Action-strategy for ImplementationPool must be function or instance of `Action` class|subclass')
-        if code in ImplementationPool._pool and strategy in ImplementationPool._pool[code]:
+                'Action-engine for ImplementationPool must be function or instance of `Action` class|subclass')
+        if code in ImplementationPool._pool and engine in ImplementationPool._pool[code]:
             raise AlreadyExistsError(
-                'Action {} with strategy {} already exists'.format(code, strategy))
-        ImplementationPool._pool[code][strategy] = actionstrategy
+                'Action {} with engine {} already exists'.format(code, engine))
+        ImplementationPool._pool[code][engine] = implementation
 
     @staticmethod
-    def get(code, strategy):
+    def get(code, engine):
         """
         Получение Стратегии выполнения Действия по коду Действия и Стратегии
 
         :param code: код Действия
-        :param strategy: Стратегия
-        :return: <ActionStratagy | Action>
+        :param engine: Стратегия
+        :return: <Implementation | Action>
         """
         if code not in ImplementationPool._pool:
             raise NotExistsError('Implementation for Action with code {code} does not exists'.format(code=code))
-        if strategy not in ImplementationPool._pool[code]:
+        if engine not in ImplementationPool._pool[code]:
             raise NotExistsError(
-                'Action with code {code} and stategy {strategy} does not exists'.format(
-                    code=code, strategy=strategy))
-        return ImplementationPool._pool[code][strategy]
+                'Action with code {code} and stategy {engine} does not exists'.format(
+                    code=code, engine=engine))
+        return ImplementationPool._pool[code][engine]
 
     @staticmethod
     def list(code):
@@ -300,7 +300,7 @@ class ImplementationPool:
         Получение списка Стратегий выполнения Действий по коду Действия
 
         :param code: код Действия
-        :return: [<ActionStratagy | Action>, ...]
+        :return: [<Implementation | Action>, ...]
         """
         if code not in ImplementationPool._pool:
             raise NotExistsError('Implementation for Action with code {code} does not exists'.format(code=code))

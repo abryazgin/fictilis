@@ -33,10 +33,10 @@ class BaseInterpreter:
 
     @classmethod
     def _evaluate_action(cls, action, context, params):
-        actionstrategy = cls._choose_actionstrategy(action, context, params)
-        if isinstance(actionstrategy, Action):
-            return cls._evaluate(action=actionstrategy, context=context, params=params)
-        res = actionstrategy.evaluate(params)
+        implementation = cls._choose_implementation(action, context, params)
+        if isinstance(implementation, Action):
+            return cls._evaluate(action=implementation, context=context, params=params)
+        res = implementation.evaluate(params)
         return cls._result_to_dict(res=res, action=action)
 
     @classmethod
@@ -93,18 +93,18 @@ class BaseInterpreter:
                 return
 
     @classmethod
-    def _choose_actionstrategy(cls, action, context, params):
+    def _choose_implementation(cls, action, context, params):
         choices = ImplementationPool.list(code=action.code)
         if len(choices) == 0:
             raise InvalidParams('Strategies for action {code} does not exist'.format(code=action.code))
-        # if strategy declared in context
-        if context.get('strategy'):
-            if context.get('strategy') not in choices:
+        # if engine declared in context
+        if context.get('engine'):
+            if context.get('engine') not in choices:
                 raise InvalidParams(
-                    'For strategy `{strategy}` not declared Implementation for action `{action}`'.format(
-                        strategy=context.get('strategy'), action=action.code
+                    'For engine `{engine}` not declared Implementation for action `{action}`'.format(
+                        engine=context.get('engine'), action=action.code
                     ))
-            return choices[context.get('strategy')]
+            return choices[context.get('engine')]
         # first choice
         for key in choices:
             return choices[key]
