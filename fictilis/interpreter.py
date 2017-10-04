@@ -98,7 +98,12 @@ class BaseInterpreter:
         if len(choices) == 0:
             raise InvalidParams('Strategies for action {code} does not exist'.format(code=action.code))
         # if strategy declared in context
-        if context.get('strategy') and context.get('strategy') in choices:
+        if context.get('strategy'):
+            if context.get('strategy') not in choices:
+                raise InvalidParams(
+                    'For strategy `{strategy}` not declared ActionStrategy for action `{action}`'.format(
+                        strategy=context.get('strategy'), action=action.code
+                    ))
             return choices[context.get('strategy')]
         # first choice
         for key in choices:
