@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
@@ -9,7 +9,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='fictilis',
-    version='0.0.6',
+    version='0.0.7',
     description="Service for processing's abstractions",
     long_description=long_description,
     url='https://gitlab.rc-online.ru/general/fictilis',
@@ -30,5 +30,5 @@ setup(
     ],
     keywords='algorithm,abstraction',
     install_requires=[],
-    packeges=['fictilis']
+    packages=find_packages(exclude=['contrib', 'docs', 'tests']),
 )
