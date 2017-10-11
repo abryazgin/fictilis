@@ -5,6 +5,8 @@ from fictilis.parameter import Parameter
 from fictilis import types
 from fictilis.context import Context
 
+from ..base import clear
+
 
 def test_engine_is_algorithm():
     res = Parameter(name='res', type_=types.Numeric)
@@ -34,3 +36,4 @@ def test_engine_is_algorithm():
         assert isinstance(result, dict)
         assert set(result.keys()) == {'res'}
         assert result['res'] == 9
+    clear()

@@ -5,6 +5,8 @@ from fictilis.parameter import Parameter
 from fictilis import types
 from fictilis.context import Context
 
+from ..base import clear
+
 
 def test_simple_usecases():
     res = Parameter(name='res', type_=types.Numeric)
@@ -97,3 +99,5 @@ def test_simple_usecases():
     assert isinstance(result, dict)
     assert set(result.keys()) == {'res'}
     assert result['res'] == -1
+
+    clear()

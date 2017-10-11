@@ -7,7 +7,7 @@ from . import types
 class BaseInterpreter:
 
     @classmethod
-    def evaluate(cls, action, context, params):
+    def evaluate(cls, action, context=None, params=None):
         """
         Выполнение Действия (или Алгоритма, как частный случай)
 
@@ -17,7 +17,7 @@ class BaseInterpreter:
         :return: Результаты выполнения Действия
         """
         # make copy of params
-        params = dict(**params)
+        params = dict(**params) if params else dict()
         return cls._evaluate(action, context, params)
 
     @classmethod
@@ -98,7 +98,7 @@ class BaseInterpreter:
         if len(choices) == 0:
             raise InvalidParams('Strategies for action {code} does not exist'.format(code=action.code))
         # if engine declared in context
-        if context.get('engine'):
+        if context and context.get('engine'):
             if context.get('engine') not in choices:
                 raise InvalidParams(
                     'For engine `{engine}` not declared Implementation for action `{action}`'.format(
