@@ -18,8 +18,10 @@ def test_simple_usecases():
     MultiA = Action('Multi', [a, b], [res])  # умножение
     DivisionA = Action('Division', [a, b], [res])  # деление
 
-    # Регистрируем реализации в системе. Способ выполнения у нас - python, поэтому и укажем такой Движок
-    engine = 'python'
+    # Регистрируем реализации в системе
+    # Для этого декларируем какой-то движок (на самом деле это просто строка,
+    # которая "объединяет" реализации
+    engine = 'some_string_that_represent_PYTHON_engine'
     Implementation(action=NegationA, engine=engine, function=lambda a: -a)
     Implementation(action=SumA, engine=engine, function=lambda a, b: a + b)
     Implementation(action=MultiA, engine=engine, function=lambda a, b: a * b)

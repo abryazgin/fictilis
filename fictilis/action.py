@@ -175,6 +175,9 @@ class Action:
                         self.code, t, ','.join(notreceived)))
         return kwvalues
 
+    def __call__(self, *args, **kwargs):
+        raise NotImplementedError
+
 
 class Implementation:
     """

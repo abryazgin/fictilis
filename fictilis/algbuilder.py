@@ -1,6 +1,13 @@
 from .algorithm import Algorithm, Step
 from .action import Action
 from .errors import InvalidParams, InvalidDeclaration
+from .lets import BaseLet
+from .algorithm import StepInlet, StepOutlet
+
+
+class Const:
+    def __init__(self, value):
+        self.value = value
 
 
 class AlgorithmBuilder:
@@ -75,6 +82,8 @@ class AlgorithmBuilder:
     @classmethod
     def _get_spec_funcs(cls, alg, binds, steps):
         def bind(fromlet, tolet):
+            if not isinstance(fromlet, (Const, StepInlet, StepOutlet, BaseLet)):
+                fromlet = Const(fromlet)
             binds[tolet] = fromlet
 
         def register(action):
