@@ -5,6 +5,8 @@ from fictilis.parameter import Parameter
 from fictilis import types
 from fictilis.context import Context
 
+from ..base import clear
+
 
 def test_simple_usecases():
     res = Parameter(name='res', type_=types.Numeric)
@@ -38,11 +40,11 @@ def test_simple_usecases():
     SquareA = AlgorithmBuilder.build('Square', [a], [res], builder=build_square)
 
     # регистрация стратегий в системе
-    strategy = 'python'
-    Implementation(action=NegationA, strategy=strategy, function=lambda a: -a)
-    Implementation(action=SumA, strategy=strategy, function=lambda a, b: a + b)
-    Implementation(action=MultiA, strategy=strategy, function=lambda a, b: a * b)
-    Implementation(action=DivisionA, strategy=strategy, function=lambda a, b: a / b)
+    engine = 'python'
+    Implementation(action=NegationA, engine=engine, function=lambda a: -a)
+    Implementation(action=SumA, engine=engine, function=lambda a, b: a + b)
+    Implementation(action=MultiA, engine=engine, function=lambda a, b: a * b)
+    Implementation(action=DivisionA, engine=engine, function=lambda a, b: a / b)
 
     # вычитание
     print('------------------------')
@@ -97,3 +99,5 @@ def test_simple_usecases():
     assert isinstance(result, dict)
     assert set(result.keys()) == {'res'}
     assert result['res'] == -1
+
+    clear()

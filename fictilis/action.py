@@ -175,6 +175,9 @@ class Action:
                         self.code, t, ','.join(notreceived)))
         return kwvalues
 
+    def __call__(self, *args, **kwargs):
+        raise NotImplementedError
+
 
 class Implementation:
     """
@@ -249,6 +252,10 @@ class ActionPool:
             raise NotExistsError('Action with code {code} does not exists'.format(code=code))
         return ActionPool._pool[code]
 
+    @staticmethod
+    def _reset():
+        ActionPool._pool = dict()
+
 
 class ImplementationPool:
     """
@@ -306,3 +313,8 @@ class ImplementationPool:
         if code not in ImplementationPool._pool:
             raise NotExistsError('Implementation for Action with code {code} does not exists'.format(code=code))
         return ImplementationPool._pool[code]
+
+    @staticmethod
+    def _reset():
+        ImplementationPool._pool = defaultdict(dict)
+

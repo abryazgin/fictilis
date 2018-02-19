@@ -153,3 +153,7 @@ class AlgorithmPool:
         if code not in AlgorithmPool._pool:
             raise NotExistsError('Algorithm with code {code} does not exists'.format(code=code))
         return AlgorithmPool._pool[code]
+
+    @staticmethod
+    def _reset():
+        AlgorithmPool._pool = dict()

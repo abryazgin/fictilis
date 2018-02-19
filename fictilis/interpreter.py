@@ -2,12 +2,13 @@ from .algorithm import Algorithm
 from .action import ImplementationPool, Action
 from .errors import InvalidParams, InvalidDeclaration
 from . import types
+from .algbuilder import Const
 
 
 class BaseInterpreter:
 
     @classmethod
-    def evaluate(cls, action, context, params):
+    def evaluate(cls, action, context=None, params=None):
         """
         Выполнение Действия (или Алгоритма, как частный случай)
 
@@ -17,7 +18,7 @@ class BaseInterpreter:
         :return: Результаты выполнения Действия
         """
         # make copy of params
-        params = dict(**params)
+        params = dict(**params) if params else dict()
         return cls._evaluate(action, context, params)
 
     @classmethod
@@ -76,7 +77,11 @@ class BaseInterpreter:
         def get_value(stepinlet):
             if stepinlet.inlet.get_type() == types.ContextType:
                 return context
-            return let_values[algorithm.binds[stepinlet]]
+            from_let = algorithm.binds[stepinlet]
+            # constants
+            if isinstance(from_let, Const):
+                return from_let.value
+            return let_values[from_let]
         return {
             stepinlet.inlet.code: get_value(stepinlet) for stepinlet in step.get_inlets().values()}
 
@@ -98,7 +103,7 @@ class BaseInterpreter:
         if len(choices) == 0:
             raise InvalidParams('Strategies for action {code} does not exist'.format(code=action.code))
         # if engine declared in context
-        if context.get('engine'):
+        if context and context.get('engine'):
             if context.get('engine') not in choices:
                 raise InvalidParams(
                     'For engine `{engine}` not declared Implementation for action `{action}`'.format(

@@ -1,15 +1,15 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
 here = path.abspath(path.dirname(__file__))
 
-with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
+with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
     name='fictilis',
-    version='0.0.6',
+    version='0.0.9',
     description="Service for processing's abstractions",
     long_description=long_description,
     url='https://gitlab.rc-online.ru/general/fictilis',
@@ -30,5 +30,5 @@ setup(
     ],
     keywords='algorithm,abstraction',
     install_requires=[],
-    packeges=['fictilis']
+    packages=find_packages(exclude=['contrib', 'docs', 'tests']),
 )
