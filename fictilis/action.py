@@ -209,7 +209,8 @@ class Implementation:
         """
         try:
             return self.function(**kwparams)
-        except TypeError:
+        except TypeError as e:
+            print(e)
             raise InvalidDeclaration(
                 'Seems like `function` for {action} have invalid declaration'.format(action=self.action))
 

@@ -84,6 +84,10 @@ class Step:
 
     def get_outlets(self):
         return self.step_outlets
+        
+    def __iter__(self):
+        for code in self.action.get_outlets_keys():
+            yield self.get_outlet(code)
 
     def __str__(self):
         return '{} step of {}: {}'.format(self.number, self.algorithm.code, self.action.code)

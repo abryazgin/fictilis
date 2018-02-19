@@ -63,6 +63,8 @@ class AlgorithmBuilder:
         res = cls._build(builder=builder, params=dict(register=register, bind=bind, **alg.inlets))
         if len(alg.outlets) == 1:
             res = [res]
+        if len(alg.outlets) == 0:
+            res = tuple()
         if len(alg.outlets) != len(res):
             raise InvalidParams('Length of outlets ({}) of algorithm {} not match length of results ({})'.format(
                 len(alg.outlets), code, len(res)))
@@ -140,11 +142,13 @@ class MagicAlgorithmBuilder(AlgorithmBuilder):
             step = register(self)
 
             for i, v in enumerate(args):
-                bind(cls._outlet_from_step(v), step.get_inlet(index=i))
+                inlet = cls._outlet_from_step(v) if isinstance(v, Step) else v
+                bind(inlet, step.get_inlet(index=i))
             for k, v in kwargs.items():
-                bind(cls._outlet_from_step(v), step.get_inlet(k))
+                inlet = cls._outlet_from_step(v) if isinstance(v, Step) else v
+                bind(inlet, step.get_inlet(k))
             return step
-
+        
         old_acall = Action.__call__
         Action.__call__ = __acall__
         result = super(MagicAlgorithmBuilder, cls)._build(builder=builder, params=params)
