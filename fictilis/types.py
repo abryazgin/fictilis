@@ -32,6 +32,7 @@ class Type:
 
 Any = Type(code='Any', validator=lambda v: v)
 Numeric = Type(code='Numeric', validator=lambda v: v if isinstance(v, (int, float)) else float(v))
+String = Type(code='String', validator=lambda s: s if isinstance(s, (str)) else '')
 
 
 def __context_validator(v):
