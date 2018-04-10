@@ -14,6 +14,36 @@
 (паттерн Стратегия).
 
 
+# Что значит "алгоритм как стркутура"?
+Сравните:
+   * Алгоритм реализовынный в виде кода функции
+```pythonstub
+def calc(a, b):
+    c = calc_c(a, b)
+    d = calc_d(a, c)
+    return prepare_result(a, b, c, d)
+```
+   * Алгоритм как самостоятельный объект
+```python
+>>> print(calc)
+Algorithm: calc
+  steps:
+    calc_c
+    calc_d
+    prepare_result
+  binds:
+    a ---> calc_c.a
+    b ---> calc_c.b
+    a ---> calc_d.a
+    calc_c.res ---> calc_d.c
+    a ---> prepare_result.a
+    b ---> prepare_result.b
+    calc_c.res ---> prepare_result.c
+    calc_d.res ---> prepare_result.d
+    prepare_result.res ---> res
+```
+
+
 # Зачем это нужно?
 
 * _Алгоритм как выделенная "структура данных" - происходит отделение 

@@ -1,6 +1,7 @@
 from .errors import AlreadyExistsError, NotExistsError, InvalidParams, InvalidDeclaration
 from .action import Action
 from .types import ContextType
+from .lets import BaseLet
 
 
 class Algorithm(Action):
@@ -38,10 +39,18 @@ class Algorithm(Action):
             yield step
 
     def __str__(self):
+        def _let_to_str(let):
+            if isinstance(let, StepInlet):
+                return '{}.{}'.format(let.step.action.code, let.inlet.code)
+            if isinstance(let, StepOutlet):
+                return '{}.{}'.format(let.step.action.code, let.outlet.code)
+            if isinstance(let, BaseLet):
+                return let.code
+
         return 'Algorithm: {}\n  steps:\n    {}\n  binds:\n    {}'.format(
             self.code,
-            '\n    '.join(str(s) for s in self.steps),
-            '\n    '.join(str(fromlet) + ' ---> ' + str(tolet) for tolet, fromlet in self.binds.items()))
+            '\n    '.join(s.action.code for s in self.steps),
+            '\n    '.join(_let_to_str(fromlet) + ' ---> ' + _let_to_str(tolet) for tolet, fromlet in self.binds.items()))
 
 
 class Step:

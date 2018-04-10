@@ -3,6 +3,7 @@ from .action import Action
 from .errors import InvalidParams, InvalidDeclaration
 from .lets import BaseLet
 from .algorithm import StepInlet, StepOutlet
+from collections import OrderedDict
 
 
 class Const:
@@ -63,7 +64,7 @@ class AlgorithmBuilder:
         """
         alg = Algorithm(code=code, in_params=in_params, out_params=out_params)
         steps = list()
-        binds = dict()
+        binds = OrderedDict()
 
         bind, register = cls._get_spec_funcs(alg=alg, binds=binds, steps=steps)
 
